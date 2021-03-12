@@ -1,0 +1,27 @@
+Admins
+
+Owners
+
+=================
+
+Resto (multiple)
+
+Menus
+
+Tables
+
+Orders
+
+==================
+
+Customer details
+
+
+
+Menu
+    - name of the dish
+    - price of the dish
+    - description
+    - image
+
+
