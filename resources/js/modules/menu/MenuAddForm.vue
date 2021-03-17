@@ -1,0 +1,85 @@
+<template>
+  <div class="add_form__wrapper">
+    <form v-on:submit.prevent="handleSubmit">
+
+      <div class="form-group">
+        <label for="name">Food item</label>
+        <input class="form-control" type="text" placeholder="Enter food item name" v-model="food.item">
+        <div class="validation-message" v-text="validation.getMessage('item')"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="name">Select category</label>
+        <multiselect
+          v-model="food.category"
+          :options="categories"
+        ></multiselect>
+        <div class="validation-message" v-text="validation.getMessage('category')"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Food description</label>
+        <textarea class="form-control" placeholder="Enter food item description" v-model="food.description"></textarea>
+        <div class="validation-message" v-text="validation.getMessage('description')"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="price">Food price</label>
+        <input class="form-control" type="number" placeholder="Enter food item price" v-model="food.price">
+        <div class="validation-message" v-text="validation.getMessage('price')"></div>
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary">Save</button>
+      </div>
+
+    </form>
+  </div>
+</template>
+
+<script>
+
+  import Multiselect from 'vue-multiselect';
+  import Validation from './../../utils/Validation';
+
+  export default {
+    props: ['categories', 'restoId'],
+    components:  {
+      Multiselect
+    },
+
+    data() {
+      return {
+        food: this.getBasicMenuItem(),
+        validation: new Validation()
+      }
+    },
+
+    methods: {
+      getBasicMenuItem() {
+        return {
+          item: '',
+          category: '',
+          price: 100,
+          description: '',
+        }
+      },
+      handleSubmit() {
+        let postData = this.food;
+        postData.restoId = this.restoId;
+        axios.post('api/item/save')
+          .then(response => {
+            console.log('response', response.data);
+            this.$emit('newMenuItemAdded', response.data, postData.category);
+            this.food = this.getBasicMenuItem();
+          })
+          .catch(error => {
+            console.log('error', error.response)
+            if (error.response.status == 422 ) {
+              this.validation.setMessage(error.response.data.errors);
+            }
+          });
+      }
+    }
+  }
+</script>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Category;
 use App\Models\Menu;
 use Illuminate\Database\Seeder;
 
@@ -12,6 +13,12 @@ class MenusTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Menu::class, 10)->create();
+        $categories = factory(Category::class, 5)->create();
+        $categories->each(function($category) {
+            factory(Menu::class, 3)->create([
+                'category_id' => $category->id,
+            ]);
+        });
+
     }
 }
