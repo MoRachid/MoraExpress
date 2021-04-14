@@ -23,7 +23,7 @@
           <menu-add-form 
             :categories="categories" 
             :resto-id="restoId"
-            v-on:newMenuItemAdded="handleNewMenuItem"
+            v-on:newItemAdded="addNewItem"
           ></menu-add-form>
         </template>
       </card-component>
@@ -68,8 +68,7 @@
     },
 
     methods: {
-      handleNewMenuItem(item, category) {
-        console.log('item', item);
+      addNewItem(item, category) {
         this.localItems[category].unshift(item);
       }
     }

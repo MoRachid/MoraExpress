@@ -18,13 +18,13 @@
       </div>
 
       <div class="form-group">
-        <label for="description">Food description</label>
+        <label for="name">Food description</label>
         <textarea class="form-control" placeholder="Enter food item description" v-model="food.description"></textarea>
         <div class="validation-message" v-text="validation.getMessage('description')"></div>
       </div>
 
       <div class="form-group">
-        <label for="price">Food price</label>
+        <label for="name">Food price</label>
         <input class="form-control" type="number" placeholder="Enter food item price" v-model="food.price">
         <div class="validation-message" v-text="validation.getMessage('price')"></div>
       </div>
@@ -65,19 +65,20 @@
         }
       },
       handleSubmit() {
-        let postData = this.food;
-        postData.restoId = this.restoId;
-        axios.post('api/item/save')
+        let food = this.food;
+        food.restoId = this.restoId;
+
+        axios.post('/api/item/save')
           .then(response => {
             console.log('response', response.data);
-            this.$emit('newMenuItemAdded', response.data, postData.category);
+            this.$emit('newItemAdded', response.data, food.category);
             this.food = this.getBasicMenuItem();
           })
           .catch(error => {
-            console.log('error', error.response)
             if (error.response.status == 422 ) {
               this.validation.setMessage(error.response.data.errors);
             }
+            console.log('error', error.response)
           });
       }
     }

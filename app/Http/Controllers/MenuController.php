@@ -5,18 +5,34 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Rules\RestoCategoryValidate;
+use App\Services\MenuService;
 use Illuminate\Http\Request;
 
 class MenuController extends Controller
 {
+    public function index($id)
+    {
+        $restoId = $id;
+        $restoService = new MenuService;
+        $menus = $restoService->getMenuWithCategory($restoId);
+
+        if(!$menus) {
+            abort(400, 'Wrong resto');
+        }
+
+        return view('menus.menu-index')
+            ->with('restoId', $restoId)
+            ->with('menus', $menus);
+    }
+
     public function saveMenuItem(Request $request)
     {
         $postData = $this->validate($request, [
-            'restoId' => 'required|numeric',
+            'item' => 'required|min:3',
             'price' => 'required|numeric',
-            'item' => 'required',
+            'restoId' => 'required|numeric',
             'description' => 'required|min:3',
-            'category' => ['required', new RestoCategoryValidate(request('resotId'))],
+            'category' => ['required', new RestoCategoryValidate(request('restoId'))],
         ]);
 
         $category = Category::where('resto_id', $postData['restoId'])
@@ -32,5 +48,19 @@ class MenuController extends Controller
         ]);
 
         return response()->json($menu, 201);
+    }
+
+    public function getRestoMenu(Request $request)
+    {
+        $this->validate($request, [
+            'restoId' => 'required|exists:restaurants.id',
+        ]);
+
+        $menuItems = Menu::where('resto_id', $request->input('restoId'))
+            ->orderBy('category_id')
+            ->get();
+
+        return response()->json($menuItems, 200);
+
     }
 }
